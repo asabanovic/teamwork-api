@@ -1,0 +1,1 @@
+Click <a href='{{ $link }}'>{{ $link }}</a> to verify your account.

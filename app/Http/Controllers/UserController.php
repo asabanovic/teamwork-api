@@ -6,16 +6,19 @@ use Illuminate\Http\Request;
 use App\User;
 use Response;
 use App\Repositories\Transformers\UserTransformer;
+use App\Repositories\ActivationRepository;
 use Validator;
 
 class UserController extends ApiController
 {   
     protected $user_transformer;
+    protected $activation_repo;
     protected $limit = 200;
 
-    public function __construct(UserTransformer $user_transformer)
+    public function __construct(UserTransformer $user_transformer, ActivationRepository $activation_repo)
     {
         $this->user_transformer = $user_transformer;
+        $this->activation_repo = $activation_repo;
     }
 
     /**
@@ -53,9 +56,10 @@ class UserController extends ApiController
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, User $user)
     {
         $rules = array('email' => 'required|email', 'password' => 'required');
         $inputs = array(
@@ -70,15 +74,13 @@ class UserController extends ApiController
         }
 
         try {
+            $user->first_name   = $request->input('first_name');
+            $user->last_name    = $request->input('last_name');
+            $user->email        = $request->input('email');
+            $user->password   = \Hash::make($request->input('password'));
+            $user->save();
 
-            User::insert([
-                'first_name' => $request->input('first_name'),
-                'last_name' => $request->input('last_name'),
-                'email' => $request->input('email'),
-                'password' => \Hash::make($request->input('password')),
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ]);
+            $this->activation_repo->createActivation($user);
 
             return $this->setStatusCode(201)->respond([
                 'message' => 'New user created!'
@@ -129,5 +131,16 @@ class UserController extends ApiController
 
         return $this->setStatusCode(404)->respondNotFound('User does not exist!');
     }
+
+    public function activateUser($token)
+    {
+        if ($user = $this->activation_repo->activateUser($token)) {
+            return $this->respond([
+                'message' => 'User has been activated!'
+            ]);
+        }
+        
+        return $this->setStatusCode(404)->respondWithError('Token does not exist');
+     }
 
  }
