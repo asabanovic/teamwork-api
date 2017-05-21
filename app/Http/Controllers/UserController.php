@@ -132,6 +132,12 @@ class UserController extends ApiController
         return $this->setStatusCode(404)->respondNotFound('User does not exist!');
     }
 
+    /**
+     * Activating user by visiting the URL form the email containing token.
+     *
+     * @param  string  $token
+     * @return \Illuminate\Http\Response
+     */
     public function activateUser($token)
     {
         if ($user = $this->activation_repo->activateUser($token)) {
