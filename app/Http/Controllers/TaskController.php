@@ -53,9 +53,10 @@ class TaskController extends ApiController
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Task $task)
     {
         $rules = array('name' => 'required');
         $inputs = array(
@@ -70,13 +71,10 @@ class TaskController extends ApiController
 
         try {
 
-            Task::insert([
-                'name' => $request->input('name'),
-                'description' => $request->input('description'),
-                'completed' => $request->input('completed') ? (boolean) $request->input('completed') : false,
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ]);
+            $task->name = $request->input('name');
+            $task->description = $request->input('description');
+            $task->completed = $request->input('completed') ? (boolean) $request->input('completed') : false;
+            $task->save();
 
             return $this->setStatusCode(201)->respond([
                 'message' => 'New task created!'
@@ -142,15 +140,15 @@ class TaskController extends ApiController
         if($validator->fails()) {
             return $this->setStatusCode(422)->respondWithError('Unprocessable Entity');
         }
-        //dd($request->input('completed')? true : false);
-        $task->update([
+
+        
+        try {
+
+            $task->update([
                 'name' => $request->input('name'),
                 'description' => $request->input('description'),
                 'completed' => (boolean)$request->input('completed'),
             ]);
-        try {
-
-            
 
             return $this->setStatusCode(201)->respond([
                 'message' => 'Task updated!'
