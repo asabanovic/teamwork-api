@@ -18,4 +18,10 @@ Route::group(['prefix' => 'v1/'], function()
 	Route::resource('users', 'UserController', ['only' => [
     	'index', 'show', 'store', 'destroy'
 	]]);
+
+	// Route::resource('tasks', 'TaskController');
+
+	Route::resource('tasks', 'TaskController', ['only' => [
+    	'index', 'show', 'store', 'destroy', 'update'
+	]]);
 });
