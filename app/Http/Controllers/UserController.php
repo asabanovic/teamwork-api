@@ -16,12 +16,6 @@ class UserController extends ApiController
     public function __construct(UserTransformer $user_transformer)
     {
         $this->user_transformer = $user_transformer;
-        // \DB::table('users')->insert([
-        //     'first_name' => 'Adnan',
-        //     'last_name' => 'Sabanovic',
-        //     'email' => 'adnanxteam@gmail.com',
-        //     'password' => \Hash::make('admin')
-        //     ]);
     }
 
     /**
