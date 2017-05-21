@@ -19,9 +19,11 @@ Route::group(['prefix' => 'v1/'], function()
     	'index', 'show', 'store', 'destroy'
 	]]);
 
-	// Route::resource('tasks', 'TaskController');
-
 	Route::resource('tasks', 'TaskController', ['only' => [
     	'index', 'show', 'store', 'destroy', 'update'
 	]]);
+
+	Route::get('tasks/{id}/users', 'UserController@showTasksUsers');
+ 	Route::get('users/{id}/tasks', 'TaskController@showUsersTasks');
+
 });

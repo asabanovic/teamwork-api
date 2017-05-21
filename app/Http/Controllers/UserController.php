@@ -8,6 +8,7 @@ use Response;
 use App\Repositories\Transformers\UserTransformer;
 use App\Repositories\ActivationRepository;
 use Validator;
+use App\Task;
 
 class UserController extends ApiController
 {   
@@ -147,6 +148,26 @@ class UserController extends ApiController
         }
         
         return $this->setStatusCode(404)->respondWithError('Token does not exist');
-     }
+    }
 
- }
+    /**
+     * List all users whom this task is assigned to.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function showTasksUsers($task_id)
+    {
+        $task = Task::find($task_id);
+
+        if ($task) {
+            $users = $task->users;
+            return $this->respond([
+                'data' => $this->user_transformer->transformCollection($users->toArray())    
+            ]); 
+        }
+
+        return $this->setStatusCode(404)->respondNotFound('Task does not exist!');
+    }
+
+}

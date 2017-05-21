@@ -7,6 +7,7 @@ use App\Task;
 use Response;
 use App\Repositories\Transformers\TaskTransformer;
 use Validator;
+use App\User;
 
 class TaskController extends ApiController
 {
@@ -178,5 +179,25 @@ class TaskController extends ApiController
         }
 
         return $this->setStatusCode(404)->respondNotFound('Task does not exist!');
+    }
+
+    /**
+     * List all tasks from a user.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function showUsersTasks($user_id)
+    {
+        $user = User::find($user_id);
+
+        if ($user) {
+            $tasks = $user->tasks;
+            return $this->respond([
+                'data' => $this->task_transformer->transformCollection($tasks->toArray())    
+            ]); 
+        }
+
+        return $this->setStatusCode(404)->respondNotFound('User does not exist!');
     }
 }
