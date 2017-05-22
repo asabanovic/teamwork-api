@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Contracts\Console\Kernel;
+use Artisan;
 
 trait CreatesApplication
 {
@@ -12,11 +13,26 @@ trait CreatesApplication
      * @return \Illuminate\Foundation\Application
      */
     public function createApplication()
-    {
+    {   
+        putenv('DB_CONNECTION=sqlite');
+        putenv('MAIL_DRIVER=log');
+
         $app = require __DIR__.'/../bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();
 
         return $app;
+    }
+
+    public function setUp()
+    {
+        parent::setUp();
+        Artisan::call('migrate');
+    }
+
+    public function tearDown()
+    {
+        Artisan::call('migrate:reset');
+        parent::tearDown();
     }
 }
